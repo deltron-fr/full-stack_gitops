@@ -1,0 +1,117 @@
+- hosts: all
+  become: true
+  vars:
+    force_restart: true
+     
+  tasks:
+    - name: Install necessary packages
+      apt:
+        pkg:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+        state: latest
+
+    - name: Add Docker GPG Apt key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu focal stable
+        state: present
+    
+    - name: Install Docker Plugins
+      apt:
+        pkg:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: latest
+    
+    - name: Install Certbot
+      apt:
+        pkg:
+          - certbot
+        state: latest
+
+    - name: Check if SSL Certificate exists
+      stat:
+        path: /etc/letsencrypt/live/deltronfr.mooo.com/fullchain.pem
+      register: ssl_cert
+
+    - name: Request SSL Certificate
+      command: certbot certonly --standalone -d deltronfr.mooo.com -d www.deltronfr.mooo.com -d db.deltronfr.mooo.com --non-interactive --agree-tos --email {{ env_vars.EMAIL }} 
+      when: 
+        - ssl_cert.stat.exists == False
+      register: certbot_result
+      changed_when: certbot_result.rc == 0
+
+    - name: Make application directory
+      file:
+        path: /opt/monitoring_app
+        state: directory
+        mode: 0755
+
+    - name: Make monitoring directory
+      file:
+        path: /opt/monitoring_app/monitoring
+        state: directory
+        owner: azureuser
+        group: azureuser
+        recurse: true
+      become: true
+
+    - name: Copy environment file
+      template:
+        src: .env.j2
+        dest: /opt/monitoring_app/.env
+        mode: 0644
+
+    - name: Create docker networks
+      docker_network:
+        name:
+          - backend_network
+          - frontend_network
+          - monitoring_network
+        state: present
+    
+    - name: Copy Nginx Configuration Files
+      template:
+        src: nginx.conf.j2
+        dest: /opt/monitoring_app/nginx.conf
+        mode: 0644
+      
+    - name: Copy docker compose application file
+      template:
+        src: compose.yaml.j2
+        dest: /opt/monitoring_app/compose.app.yaml
+        mode: 0644
+
+    - name: Copy docker compose monitoring file
+      template:
+        src: compose.monitoring.yaml.j2
+        dest: /opt/monitoring_app/compose.monitoring.yaml
+        mode: 0644
+    
+    - name: Copy Monitoring directory to server
+      synchronize:
+        src: ../monitoring
+        dest: /opt/monitoring_app
+      become: false
+
+    - name: Stop and remove existing containers along with volumes(when force restart is true)
+      command: docker compose -f compose.app.yaml -f compose.monitoring.yaml down --volumes
+      args:
+        chdir: /opt/monitoring_app
+      when: force_restart | bool
+
+    - name: Run docker compose command
+      command: docker compose -f compose.app.yaml -f compose.monitoring.yaml up -d --force-recreate
+      args:
+        chdir: /opt/monitoring_app
+      
