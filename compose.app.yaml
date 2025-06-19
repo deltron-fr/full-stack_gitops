@@ -1,0 +1,101 @@
+include:
+  - compose.monitoring.yaml
+
+services:
+  db:
+    image: postgres:13
+    restart: always
+    container_name: postgres
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: app
+      POSTGRES_DB: app
+    volumes:
+      - postgres_vol:/var/lib/postgresql/data
+    expose:
+      - "5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d app"]
+      interval: 10s
+      retries: 15
+    networks:
+      - backend_network
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - backend_network
+    depends_on:
+      - db
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    depends_on:
+      - db
+    env_file:
+      - ./backend/.env
+    ports:
+      - 8000:8000
+    volumes:
+      - ./backend:/app
+    networks:
+      - backend_network
+      - frontend_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - 5173:5173
+    env_file:
+      - ./frontend/.env
+    depends_on:
+      - db
+      - backend
+    networks:
+      - frontend_network
+      - backend_network
+  
+  nginx:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: nginx-proxy-manager
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "81:81"
+      - "443:443"
+    volumes:
+      - data:/data
+      - letsencrypt:/etc/letsencrypt
+      #- ./nginx/nginx.conf:/data/nginx/custom/http_top.conf
+    depends_on:
+      - db
+      - frontend
+      - backend
+      - cadvisor
+      - adminer
+      - prometheus
+      - grafana
+    networks:
+      - monitoring_network
+      - frontend_network
+      - backend_network
+
+volumes:
+  postgres_vol:
+  data:
+  letsencrypt:
+
+networks:
+  frontend_network:
+  backend_network:
+  monitoring_network:
