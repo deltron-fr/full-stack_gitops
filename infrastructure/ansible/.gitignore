@@ -1,0 +1,3 @@
+group_vars/
+inventory.ini
+ansible.cfg

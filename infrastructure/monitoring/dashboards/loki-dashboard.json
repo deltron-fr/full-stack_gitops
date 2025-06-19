@@ -1,0 +1,20 @@
+{
+    "id": null,
+    "title": "Loki Logs",
+    "panels": [
+      {
+        "datasource": "loki",
+        "type": "logs",
+        "title": "Container Logs",
+        "targets": [
+          {
+            "datasource": "loki",
+            "expr": "{container=~\".+\"}"
+          }
+        ],
+        "options": {
+          "showLabels": true
+        }
+      }
+    ]
+  }

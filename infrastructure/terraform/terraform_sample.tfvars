@@ -1,0 +1,10 @@
+resource_name       = "resource"
+location            = "West Europe"
+address_space       = ["10.0.0.0/16"]
+address_prefixes    = ["10.0.0.0/24"]
+vm_size             = "Standard_B2s"
+admin_username      = "azureuser"
+ssh_key_path        = "<path_to_your_ssh_public_key>"
+inventory_file_path = "<path_to_your_ansible_inventory_file>"
+ssh_pri_key = "<path_to_your_ssh_private_key>"
+dns_password = "<your_dns_password>"
