@@ -25,43 +25,31 @@ jobs:
       pull-requests: write
 
     steps:
-      - name: Checkout PR branch
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Terraform plan
-        id: plan
-        if: github.event_name == 'pull_request'
-        run: terraform plan -no-color -input=false
-        continue-on-error: true
-  
-      - uses: actions/github-script@v6
-        if: github.event_name == 'pull_request'
-        env:
-          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
         with:
-          script: |
-            const output = `#### Terraform Plan 📖`${{ steps.plan.outcome }}\`
+          terraform_version: 1.11.0
 
-            <details><summary>Show Plan</summary>
+      - name: Terraform Init
+        run: |
+          cd infrastructure/terraform
+          terraform init
 
-            \`\`\`\n
-            ${process.env.PLAN}
-            \`\`\`
+      - name: Terraform plan
+        run: |
+          cd infrastructure/terraform
+          terraform -out .planfile
 
-            </details>
-            *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
-
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: output
-            })
-
-      - name: Terraform Plan Status
-        if: steps.plan.outcome == 'failure'
-        run: exit 1
-
+      - name: Post PR comment
+        uses: borchero/terraform-plan-comment@v2
+        with:
+          token: ${{ github.token }}
+          planfile: ./infrastructure/terraform/planfile
+          header: 📝 Terraform Plan
+     
       - name: Setup Infracost
         uses: infracost/actions/setup@v3
         with:
