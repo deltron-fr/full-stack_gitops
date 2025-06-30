@@ -2,6 +2,8 @@ name: infra-main
 
 on:
   pull_request:
+    branches:
+      - infra_main
     types: [opened, closed]
   push:
     branches:
