@@ -15,6 +15,7 @@ jobs:
       ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
       
     runs-on: ubuntu-latest
+    
     defaults:
       run:
         shell: bash
