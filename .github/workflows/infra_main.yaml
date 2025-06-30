@@ -2,88 +2,94 @@ name: infra-main
 
 on:
   pull_request:
-      types: [opened, closed]
+    types: [opened, closed]
   push:
     branches:
       - infra_main
 
 jobs:
   infracost-pull-request-checks:
-      name: Infracost Pull Request Checks
-      if: github.event_name == 'pull_request'
-      runs-on: ubuntu-latest
-      permissions:
-        contents: read
-        pull_request: write
+    env:
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
 
-      steps:
-        - name: Checkout PR branch
-          uses: actions/checkout@v4
+    name: Infracost Pull Request Checks
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull_request: write
 
-        - name: Terraform plan
-          id: plan
-          if: github.event_name == 'pull_request'
-          run: terraform plan -no-color -input=false
-          continue-on-error: true
-    
-        - uses: actions/github-script@v6
-          if: github.event_name == 'pull_request'
-          env:
-            PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
-          with:
-            script: |
-              const output = `#### Terraform Plan 📖`${{ steps.plan.outcome }}\`
- 
-              <details><summary>Show Plan</summary>
- 
-              \`\`\`\n
-              ${process.env.PLAN}
-              \`\`\`
- 
-              </details>
-              *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
- 
-              github.rest.issues.createComment({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body: output
-              })
- 
-        - name: Terraform Plan Status
-          if: steps.plan.outcome == 'failure'
-          run: exit 1
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v3
 
-        - name: Setup Infracost
-          uses: infracost/actions/setup@v3
-          with:
-            api-key: ${{ secrets.INFRACOST_API_KEY }}
+      - name: Terraform plan
+        id: plan
+        if: github.event_name == 'pull_request'
+        run: terraform plan -no-color -input=false
+        continue-on-error: true
+  
+      - uses: actions/github-script@v6
+        if: github.event_name == 'pull_request'
+        env:
+          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+        with:
+          script: |
+            const output = `#### Terraform Plan 📖`${{ steps.plan.outcome }}\`
 
-        # - name: Checkout base branch
-        #   uses: actions/checkout@v4
-        #   with:
-        #     ref: '${{ github.event.pull_request.base.ref }}'
+            <details><summary>Show Plan</summary>
 
-        - name: Generate Infracost cost estimate 
-          run: |
-            infracost breakdown --path=infrastructure \
-                              --format=json \
-                              --out-file=/tmp/infracost.json
+            \`\`\`\n
+            ${process.env.PLAN}
+            \`\`\`
 
-        # - name: Checkout PR branch
-        #   uses: actions/checkout@v4
+            </details>
+            *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
 
-        # - name: Generate Infracost diff
-        #   run: |
-        #     infracost diff --path=. \
-        #                   --format=json \
-        #                   --compare-to=/tmp/infracost-base.json \
-        #                   --out-file=/tmp/infracost.json
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
 
-        - name: Post Infracost comment
-          run: |
-            infracost comment github --path=/tmp/infracost.json \
-                                     --repo=$GITHUB_REPOSITORY \
-                                     --github-token=${{ github.token }} \
-                                     --pull-request=${{ github.event.pull_request.number }} \
-                                     --behavior=update
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
+      - name: Setup Infracost
+        uses: infracost/actions/setup@v3
+        with:
+          api-key: ${{ secrets.INFRACOST_API_KEY }}
+
+      # - name: Checkout base branch
+      #   uses: actions/checkout@v4
+      #   with:
+      #     ref: '${{ github.event.pull_request.base.ref }}'
+
+      - name: Generate Infracost cost estimate 
+        run: |
+          infracost breakdown --path=infrastructure \
+                            --format=json \
+                            --out-file=/tmp/infracost.json
+
+      # - name: Checkout PR branch
+      #   uses: actions/checkout@v4
+
+      # - name: Generate Infracost diff
+      #   run: |
+      #     infracost diff --path=. \
+      #                   --format=json \
+      #                   --compare-to=/tmp/infracost-base.json \
+      #                   --out-file=/tmp/infracost.json
+
+      - name: Post Infracost comment
+        run: |
+          infracost comment github --path=/tmp/infracost.json \
+                                    --repo=$GITHUB_REPOSITORY \
+                                    --github-token=${{ github.token }} \
+                                    --pull-request=${{ github.event.pull_request.number }} \
+                                    --behavior=update
