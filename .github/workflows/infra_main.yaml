@@ -16,6 +16,7 @@ jobs:
     name: Infracost Pull Request Checks
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    
     permissions:
       contents: read
       pull-requests: write
