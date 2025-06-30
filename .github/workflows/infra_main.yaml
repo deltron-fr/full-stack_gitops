@@ -16,7 +16,7 @@ jobs:
     name: Infracost Pull Request Checks
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    
+
     permissions:
       contents: read
       pull-requests: write
@@ -38,7 +38,7 @@ jobs:
       - name: Terraform plan
         run: |
           cd infrastructure/terraform
-          terraform plan -input=false -out .planfile
+          terraform plan -input=false -var-file=terraform_sample.tfvars -out .planfile
 
       - name: Post PR comment
         uses: borchero/terraform-plan-comment@v2
