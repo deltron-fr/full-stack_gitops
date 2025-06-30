@@ -31,15 +31,15 @@ jobs:
 
       - name: Terraform Init
         run: |
-          cd infrastructure
+          cd infrastructure/terraform
           terraform init
 
       - name: Terraform format
         run: | 
-          cd infrastructure
+          cd infrastructure/terraform
           terraform fmt -check
 
       - name: Terraform validate
         run: | 
-          cd infrastructure
+          cd infrastructure/terraform
           terraform validate
