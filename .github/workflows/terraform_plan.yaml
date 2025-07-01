@@ -12,15 +12,16 @@ jobs:
       ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
       ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-      TF_VARS_resource_name: ${{ secrets.TF_VARS_RESOURCE_NAME }}
-      TF_VARS_location: ${{ secrets.TF_VARS_LOCATION }} 
-      TF_VARS_address_space: ${{ secrets.TF_VARS_ADDRESS_SPACE }}
-      TF_VARS_address_prefixes: ${{ secrets.TF_VARS_ADDRESS_PREFIXES }}
-      TF_VARS_vm_size: ${{ secrets.TF_VARS_VM_SIZE }}
-      TF_VARS_admin_username: ${{ secrets.TF_VARS_ADMIN_USERNAME }}
-      TF_VARS_ssh_key_path: ${{ secrets.TF_VARS_SSH_KEY_PATH }}
-      TF_VARS_ssh_pri_key: ${{ secrets.TF_VARS_SSH_PRI_KEY_PATH }}
-      TF_VARS_dns_password: ${{ secrets.TF_VARS_DNS_PASSWORD }}
+
+      TF_VAR_resource_name: ${{ secrets.TF_VARS_RESOURCE_NAME }}
+      TF_VAR_location: ${{ secrets.TF_VARS_LOCATION }} 
+      TF_VAR_address_space: ${{ secrets.TF_VARS_ADDRESS_SPACE }}
+      TF_VAR_address_prefixes: ${{ secrets.TF_VARS_ADDRESS_PREFIXES }}
+      TF_VAR_vm_size: ${{ secrets.TF_VARS_VM_SIZE }}
+      TF_VAR_admin_username: ${{ secrets.TF_VARS_ADMIN_USERNAME }}
+      TF_VAR_ssh_key_path: ${{ secrets.TF_VARS_SSH_KEY_PATH }}
+      TF_VAR_ssh_pri_key: ${{ secrets.TF_VARS_SSH_PRI_KEY_PATH }}
+      TF_VAR_dns_password: ${{ secrets.TF_VARS_DNS_PASSWORD }}
 
     name: Infracost Pull Request Checks
     if: github.event_name == 'pull_request'
@@ -62,7 +63,7 @@ jobs:
         uses: borchero/terraform-plan-comment@v2
         with:
           token: ${{ github.token }}
-          planfile: ./infrastructure/terraform/planfile
+          planfile: ./infrastructure/terraform/.planfile
           header: 📝 Terraform Plan
      
       - name: Setup Infracost
