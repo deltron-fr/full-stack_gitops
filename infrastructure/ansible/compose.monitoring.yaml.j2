@@ -57,11 +57,6 @@ services:
       - backend_network
       - frontend_network
       - monitoring_network
-    depends_on:
-      - backend
-      - frontend
-      - adminer
-      - db
     privileged: true
     
   loki:
