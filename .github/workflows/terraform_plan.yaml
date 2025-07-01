@@ -71,13 +71,27 @@ jobs:
         with:
           api-key: ${{ secrets.INFRACOST_API_KEY }}
 
+      - name: Checkout base branch
+        uses: actions/checkout@v4
+        with:
+          ref: '${{ github.event.pull_request.base.ref }}'
 
-      - name: Generate Infracost cost estimate 
+      
+      - name: Generate Infracost cost estimate baseline
         run: |
           infracost breakdown --path=infrastructure/terraform \
-                            --format=json \
-                            --out-file=/tmp/infracost.json
+                              --format=json \
+                              --out-file=/tmp/infracost-base.json
 
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+
+      - name: Generate Infracost diff
+        run: |
+          infracost diff --path=infrastructure/terraform \
+                          --format=json \
+                          --compare-to=/tmp/infracost-base.json \
+                          --out-file=/tmp/infracost.json
 
       - name: Post Infracost comment
         run: |
