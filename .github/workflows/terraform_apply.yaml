@@ -20,7 +20,6 @@ jobs:
       TF_VAR_dns_password: ${{ secrets.TF_VARS_DNS_PASSWORD }}
 
     name: deploy terraform and configure monitoring stack
-    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
 
     steps:
@@ -40,7 +39,7 @@ jobs:
           touch infrastructure/ansible/ansible.cfg
           echo "[defaults]" > infrastructure/ansible/ansible.cfg
           echo "inventory = inventory.ini" >> infrastructure/ansible/ansible.cfg
-          echo "private_key_file = ${{ secrets.TF_VARS_SSH_PRI_KEY_PATH }}" >> infrastructure/ansible/ansible.cfg
+          echo "private_key_file = /home/runner/.ssh/id_rsa" >> infrastructure/ansible/ansible.cfg
           echo "remote_user = ${{ secrets.REMOTE_USER }}" >> infrastructure/ansible/ansible.cfg 
 
 
@@ -63,6 +62,6 @@ jobs:
       - name: Terraform apply
         run: |
           cd infrastructure/terraform
-          terraform -auto-approve
+          terraform apply -auto-approve
 
         
