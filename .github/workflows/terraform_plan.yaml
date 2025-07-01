@@ -47,7 +47,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.11.0
+          terraform_version: 1.9.5
 
       - name: Terraform Init
         run: |
@@ -58,15 +58,13 @@ jobs:
         run: |
           cd infrastructure/terraform
           terraform plan -input=false -out=.planfile
-          terraform show -json .planfile > plan.json
 
       - name: Post PR comment
         uses: borchero/terraform-plan-comment@v2
         with:
           token: ${{ github.token }}
           working-directory: ./infrastructure/terraform
-          planfile: plan.json
-          header: 📝 Terraform Plan
+          planfile: .planfile
      
       - name: Setup Infracost
         uses: infracost/actions/setup@v3
