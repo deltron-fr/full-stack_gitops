@@ -9,7 +9,7 @@ resource "null_resource" "inventory_and_knownhosts" {
   }
 
   triggers = {
-    script_version = "1.0.0"
+    script_version = "1.0.1"
   }
 }
 
@@ -32,7 +32,7 @@ resource "null_resource" "ansible_provisioner" {
   }
 
   triggers = {
-    script_version = "1.0.0"
+    script_version = "1.0.1"
   }
 
   depends_on = [azurerm_linux_virtual_machine.main,
