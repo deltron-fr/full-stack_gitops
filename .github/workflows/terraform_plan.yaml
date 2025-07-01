@@ -57,7 +57,7 @@ jobs:
       - name: Terraform plan
         run: |
           cd infrastructure/terraform
-          terraform plan -input=false -out .planfile
+          terraform plan -input=false -out=.planfile
 
       - name: Post PR comment
         uses: borchero/terraform-plan-comment@v2
