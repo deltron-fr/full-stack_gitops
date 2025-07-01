@@ -23,7 +23,7 @@ jobs:
       TF_VAR_ssh_pri_key: ${{ secrets.TF_VARS_SSH_PRI_KEY_PATH }}
       TF_VAR_dns_password: ${{ secrets.TF_VARS_DNS_PASSWORD }}
 
-    name: Infracost Pull Request Checks
+    name: Infracost PR Checks and terraform plan comment
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
 

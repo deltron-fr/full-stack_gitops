@@ -102,5 +102,13 @@ volumes:
   grafana-data:
   loki-data:
 
+networks:
+  frontend_network:
+    driver: bridge
+  backend_network:
+    driver: bridge
+  monitoring_network:
+    driver: bridge
+
 
 
