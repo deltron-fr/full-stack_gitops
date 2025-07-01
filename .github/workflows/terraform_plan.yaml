@@ -12,6 +12,15 @@ jobs:
       ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
       ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      TF_VARS_resource_name: ${{ secrets.TF_VARS_RESOURCE_NAME }}
+      TF_VARS_location: ${{ secrets.TF_VARS_LOCATION }} 
+      TF_VARS_address_space: ${{ secrets.TF_VARS_ADDRESS_SPACE }}
+      TF_VARS_address_prefixes: ${{ secrets.TF_VARS_ADDRESS_PREFIXES }}
+      TF_VARS_vm_size: ${{ secrets.TF_VARS_VM_SIZE }}
+      TF_VARS_admin_username: ${{ secrets.TF_VARS_ADMIN_USERNAME }}
+      TF_VARS_ssh_key_path: ${{ secrets.TF_VARS_SSH_KEY_PATH }}
+      TF_VARS_ssh_pri_key: ${{ secrets.TF_VARS_SSH_PRI_KEY_PATH }}
+      TF_VARS_dns_password: ${{ secrets.TF_VARS_DNS_PASSWORD }}
 
     name: Infracost Pull Request Checks
     if: github.event_name == 'pull_request'
@@ -24,6 +33,15 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+
+      - name: Write ssh keys to file
+        run: |
+          mkdir -p /home/test/.ssh
+          echo "${{ secrets.SSH_PUBLIC_KEY }}" > /home/test/.ssh/id_rsa.pub
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > /home/test/.ssh/id_rsa
+          chmod 600 /home/test/.ssh/id_rsa
+          chmod 644 /home/test/.ssh/id_rsa.pub
+
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
@@ -38,7 +56,7 @@ jobs:
       - name: Terraform plan
         run: |
           cd infrastructure/terraform
-          terraform plan -input=false -var-file=terraform_sample.tfvars -out .planfile
+          terraform plan -input=false -out .planfile
 
       - name: Post PR comment
         uses: borchero/terraform-plan-comment@v2
@@ -52,10 +70,6 @@ jobs:
         with:
           api-key: ${{ secrets.INFRACOST_API_KEY }}
 
-      # - name: Checkout base branch
-      #   uses: actions/checkout@v4
-      #   with:
-      #     ref: '${{ github.event.pull_request.base.ref }}'
 
       - name: Generate Infracost cost estimate 
         run: |
@@ -63,15 +77,6 @@ jobs:
                             --format=json \
                             --out-file=/tmp/infracost.json
 
-      # - name: Checkout PR branch
-      #   uses: actions/checkout@v4
-
-      # - name: Generate Infracost diff
-      #   run: |
-      #     infracost diff --path=. \
-      #                   --format=json \
-      #                   --compare-to=/tmp/infracost-base.json \
-      #                   --out-file=/tmp/infracost.json
 
       - name: Post Infracost comment
         run: |
