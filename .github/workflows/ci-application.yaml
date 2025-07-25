@@ -12,7 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       packages: write
-      contents: read
+      contents: write
+      
     env:
       IMAGE_REGISTRY_BACKEND: ${{ vars.IMAGE_REGISTRY_BACKEND }}
       IMAGE_REGISTRY_FRONTEND: ${{ vars.IMAGE_REGISTRY_FRONTEND }}
@@ -104,6 +105,5 @@ jobs:
           git add .
           git commit -m "automated commit"
           git push origin HEAD:integration
-
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
