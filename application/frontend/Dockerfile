@@ -1,18 +1,15 @@
-FROM node:latest
+FROM node:22
 
-# Set the working directory
 WORKDIR /app
 
-# Copy the application files
-COPY . .
+COPY package*.json ./
 
-# Install dependencies
 RUN npm install
 
-# Expose the port the development server runs on
+COPY . .
+
 EXPOSE 5173
 
-# Run the development server
 CMD ["npm", "run", "dev", "--", "--host"]
 
 
