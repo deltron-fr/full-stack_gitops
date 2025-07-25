@@ -33,9 +33,7 @@ services:
       - db
 
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: deltronfr/monitoring-backend-repo:latest
     container_name: backend
     depends_on:
       - db
@@ -50,9 +48,7 @@ services:
       - frontend_network
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+    image: deltronfr/monitoring-frontend-repo:latest
     container_name: frontend
     ports:
       - 5173:5173
