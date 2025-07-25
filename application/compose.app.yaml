@@ -48,7 +48,7 @@ services:
       - frontend_network
 
   frontend:
-    image: deltronfr/monitoring-frontend-repo:latest
+    image: deltronfr/monitoring-frontend-repo:3472955a9e13d067c722f5d7c239917497fbeaa6
     container_name: frontend
     ports:
       - 5173:5173
