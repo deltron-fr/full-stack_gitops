@@ -13,6 +13,9 @@ jobs:
     permissions:
       packages: write
       contents: read
+    env:
+      IMAGE_REGISTRY_BACKEND: ${{ vars.IMAGE_REGISTRY_BACKEND }}
+      IMAGE_REGISTRY_FRONTEND: ${{ vars.IMAGE_REGISTRY_FRONTEND }}
     if: github.actor != 'github-actions[bot]'
 
     
