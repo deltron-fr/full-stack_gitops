@@ -1,0 +1,18 @@
+name: Deploy application stack
+
+on:
+  push:
+    branches: deployment
+
+jobs:
+  deploy:
+    name: Deploy to provisioned infrastructure
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+
+      - name: deploy to vm
+        run: |
+          
