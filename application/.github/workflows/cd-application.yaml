@@ -13,6 +13,25 @@ jobs:
       - name: checkout repository
         uses: actions/checkout@v4
 
-      - name: deploy to vm
+      - name: Write ssh keys to file
         run: |
-          
+          mkdir -p /home/runner/.ssh
+          echo "${{ secrets.SSH_PUBLIC_KEY }}" > /home/runner/.ssh/id_rsa.pub
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > /home/runner/.ssh/id_rsa
+          chmod 600 /home/runner/.ssh/id_rsa
+          chmod 644 /home/runner/.ssh/id_rsa.pub
+
+
+      - name: deploy to vm
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: deltronfr.mooo.com
+          username: ${{ secrets.TF_VARS_ADMIN_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.PORT }}
+
+          script: |
+                cd application/
+                git pull origin deployment
+                sudo docker compose -f compose.app.yaml down --volumes || true
+                docker compose -f compose.app.yaml up -d --force-recreate
