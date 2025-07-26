@@ -30,7 +30,7 @@ services:
       - db
 
   backend:
-    image: deltronfr/monitoring-backend-repo:f379b92f51a5f448267cca018808d01ea701d35c
+    image: deltronfr/monitoring-backend-repo:c484c41b0f584313c3e3869552ae06978c8c153a
     container_name: backend
     depends_on:
       - db
@@ -45,7 +45,7 @@ services:
       - frontend_network
 
   frontend:
-    image: deltronfr/monitoring-frontend-repo:f379b92f51a5f448267cca018808d01ea701d35c
+    image: deltronfr/monitoring-frontend-repo:c484c41b0f584313c3e3869552ae06978c8c153a
     container_name: frontend
     ports:
       - 5173:5173
