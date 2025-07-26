@@ -73,7 +73,6 @@ services:
       - db
       - frontend
       - backend
-      - cadvisor
       - adminer
     networks:
       - monitoring_network
