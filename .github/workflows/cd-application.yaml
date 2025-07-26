@@ -26,6 +26,8 @@ jobs:
           script: |
               
                 echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
+                ssh-keyscan github.com >> ~/.ssh/known_hosts
+
                 if [ ! -d "full-stack_gitops/.git" ]; then
                   git clone --branch deployment git@github.com:deltron-fr/full-stack_gitops.git full-stack_gitops
                 fi
