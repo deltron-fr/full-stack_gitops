@@ -24,7 +24,8 @@ jobs:
           port: ${{ secrets.PORT }}
 
           script: |
-                cd ~/full-stack_gitops
+                ls
+                cd ~/stack_gitops
                 git pull origin deployment
                 cd application/
                 echo "${{ secrets.DOCKER_ENV_FILE }}" > .env
