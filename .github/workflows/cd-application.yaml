@@ -24,9 +24,15 @@ jobs:
           port: ${{ secrets.PORT }}
 
           script: |
-                ls
-                cd ~/stack_gitops
+
+                echo "{{ secrets.SSH_KEY }}" > id_ed25519
+                if [ ! -d "full-stack_gitops/.git" ]; then
+                  git clone --branch deployment git@github.com:deltron-fr/full-stack_gitops.git full-stack_gitops
+                fi
+
+                cd full-stack_gitops
                 git pull origin deployment
+
                 cd application/
                 echo "${{ secrets.DOCKER_ENV_FILE }}" > .env
                 sudo docker compose -f compose.app.yaml down --volumes || true
