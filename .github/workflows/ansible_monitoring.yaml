@@ -45,6 +45,11 @@ jobs:
           echo "[web_servers]" > infrastructure/ansible/inventory.ini
           echo "deltronfr.mooo.com" >> infrastructure/ansible/inventory.ini
 
+      - name: Load env vars for the playbook
+        run: |
+          cd infrastructure/ansible
+          echo "${{ secrets.ANS_VARS }}" > group_vars/all.yaml
+
       - name: Run Ansible playbook
         run: |
           cd infrastructure/ansible
