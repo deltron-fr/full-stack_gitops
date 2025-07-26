@@ -45,4 +45,4 @@ jobs:
                 echo ${{ secrets.ENV_FILE }} > backend/.env
 
                 sudo docker compose -f compose.app.yaml down --volumes || true
-                docker compose -f compose.app.yaml up -d --force-recreate
+                sudo docker compose -f compose.app.yaml up -d --force-recreate
