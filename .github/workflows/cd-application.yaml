@@ -1,0 +1,39 @@
+name: Deploy application stack
+
+on:
+  push:
+    branches: deployment
+
+jobs:
+  deploy:
+    name: Deploy to provisioned infrastructure
+    runs-on: ubuntu-latest
+
+    
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+
+      - name: Write ssh keys to file
+        run: |
+          mkdir -p /home/runner/.ssh
+          echo "${{ secrets.SSH_PUBLIC_KEY }}" > /home/runner/.ssh/id_rsa.pub
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > /home/runner/.ssh/id_rsa
+          chmod 600 /home/runner/.ssh/id_rsa
+          chmod 644 /home/runner/.ssh/id_rsa.pub
+
+
+      - name: deploy to vm
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: deltronfr.mooo.com
+          username: ${{ secrets.TF_VARS_ADMIN_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.PORT }}
+
+          script: |
+                cd application/
+                echo "${{ secrets.DOCKER_ENV_FILE }}" > .env
+                git pull origin deployment
+                sudo docker compose -f compose.app.yaml down --volumes || true
+                docker compose -f compose.app.yaml up -d --force-recreate
