@@ -33,10 +33,16 @@ jobs:
                   git clone --branch deployment git@github.com:deltron-fr/full-stack_gitops.git full-stack_gitops
                 fi
 
+
+
                 cd full-stack_gitops
                 git pull origin deployment
 
+                
                 cd application/
                 echo "${{ secrets.DOCKER_ENV_FILE }}" > .env
+                echo ${{ secrets.VITE_API_URL }} > frontend/.env
+                echo ${{ secrets.ENV_FILE }} > backend/.env
+
                 sudo docker compose -f compose.app.yaml down --volumes || true
                 docker compose -f compose.app.yaml up -d --force-recreate
