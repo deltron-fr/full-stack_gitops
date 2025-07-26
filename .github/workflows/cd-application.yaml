@@ -24,8 +24,8 @@ jobs:
           port: ${{ secrets.PORT }}
 
           script: |
-
-                echo "{{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
+              
+                echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
                 if [ ! -d "full-stack_gitops/.git" ]; then
                   git clone --branch deployment git@github.com:deltron-fr/full-stack_gitops.git full-stack_gitops
                 fi
