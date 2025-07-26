@@ -69,7 +69,7 @@
       become: false
 
     - name: Stop and remove existing containers along with volumes(when force restart is true)
-      command: docker compose  -f compose.monitoring.yaml down --volumes
+      command: docker compose -f compose.monitoring.yaml down --volumes
       args:
         chdir: /opt/monitoring_app
       when: force_restart | bool
