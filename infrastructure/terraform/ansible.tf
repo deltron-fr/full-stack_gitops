@@ -27,10 +27,6 @@ resource "null_resource" "ansible_provisioner" {
     }
   }
 
-  provisioner "local-exec" {
-    command = "cd ../ansible && ansible-playbook playbook.yaml"
-  }
-
   triggers = {
     script_version = "1.0.1"
   }

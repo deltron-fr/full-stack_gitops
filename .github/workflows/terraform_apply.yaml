@@ -54,11 +54,6 @@ jobs:
         with:
             terraform_version: 1.9.5
 
-      - name: Install Ansible
-        shell: bash
-        run: |
-          sudo apt update
-          sudo apt install -y ansible
 
       - name: Terraform init
         run: |
