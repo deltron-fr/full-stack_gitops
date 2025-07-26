@@ -80,18 +80,18 @@ services:
       - frontend_network
       - backend_network
 
-    certbot:
-      image: certbot/certbot:latest
-      container_name: certbot
-      entrypoint: ["/bin/sh", "-c", "certbot renew --standalone --quiet && sleep 12h & wait"]
-      volumes:
-        - /etc/letsencrypt:/etc/letsencrypt
-      restart: unless-stopped
+  certbot:
+    image: certbot/certbot:latest
+    container_name: certbot
+    entrypoint: ["/bin/sh", "-c", "certbot renew --standalone --quiet && sleep 12h & wait"]
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+    restart: unless-stopped
 
-      networks:
-        - monitoring_network
-        - frontend_network
-        - backend_network
+    networks:
+      - monitoring_network
+      - frontend_network
+      - backend_network
 
 volumes:
   postgres_vol:
