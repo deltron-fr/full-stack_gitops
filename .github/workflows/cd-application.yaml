@@ -32,8 +32,8 @@ jobs:
           port: ${{ secrets.PORT }}
 
           script: |
+                git pull origin deployment
                 cd application/
                 echo "${{ secrets.DOCKER_ENV_FILE }}" > .env
-                git pull origin deployment
                 sudo docker compose -f compose.app.yaml down --volumes || true
                 docker compose -f compose.app.yaml up -d --force-recreate
