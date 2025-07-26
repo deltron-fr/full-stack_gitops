@@ -37,7 +37,19 @@
       apt:
         pkg:
           - certbot
-        state: latest
+        state: 
+        
+    - name: Check if SSL Certificate exists
+      stat:
+        path: /etc/letsencrypt/live/deltronfr.mooo.com/fullchain.pem
+      register: ssl_cert
+
+    - name: Request SSL Certificate
+      command: certbot certonly --standalone -d deltronfr.mooo.com -d www.deltronfr.mooo.com -d db.deltronfr.mooo.com --non-interactive --agree-tos --email {{ env_vars.EMAIL }} 
+      when: 
+        - ssl_cert.stat.exists == False
+      register: certbot_result
+      changed_when: certbot_result.rc == 0
 
     - name: Make monitoring directory
       file:
