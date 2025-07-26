@@ -48,6 +48,8 @@ jobs:
       - name: Load env vars for the playbook
         run: |
           cd infrastructure/ansible
+          mkdir group_vars
+          touch group_vars/all.yaml
           echo "${{ secrets.ANS_VARS }}" > group_vars/all.yaml
 
       - name: Run Ansible playbook
