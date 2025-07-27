@@ -62,20 +62,17 @@
 
     - name: Create docker networks
       docker_network:
-        name:
-          - backend_network
+        name: backend_network
         state: present
 
     - name: Create docker networks
       docker_network:
-        name:
-          - frontend_network
+        name: frontend_network
         state: present
 
     - name: Create docker networks
       docker_network:
-        name:
-          - monitoring_network
+        name: monitoring_network
         state: present
     
     - name: Copy docker compose monitoring file
