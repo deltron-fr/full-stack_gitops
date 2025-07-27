@@ -99,11 +99,11 @@ volumes:
 
 networks:
   frontend_network:
-    driver: bridge
+    external: true
   backend_network:
-    driver: bridge
+    external: true
   monitoring_network:
-    driver: bridge
+    external: true
 
 
 
