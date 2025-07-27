@@ -24,8 +24,24 @@ jobs:
           port: ${{ secrets.PORT }}
 
           script: |
+                echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
+                chmod 600 ~/.ssh/id_ed25519
+                ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+                if [ ! -d "full-stack_gitops/.git" ]; then
+                  git clone --branch deployment git@github.com:deltron-fr/full-stack_gitops.git full-stack_gitops
+                fi
+
+
+
+                cd full-stack_gitops
                 git pull origin deployment
+
+                
                 cd application/
                 echo "${{ secrets.DOCKER_ENV_FILE }}" > .env
+                echo ${{ secrets.VITE_API_URL }} > frontend/.env
+                echo ${{ secrets.ENV_FILE }} > backend/.env
+
                 sudo docker compose -f compose.app.yaml down --volumes || true
                 sudo docker compose -f compose.app.yaml up -d --force-recreate
