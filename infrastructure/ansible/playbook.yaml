@@ -80,10 +80,6 @@
         dest: /opt/monitoring_app
       become: false
 
-    - name: Create external docker networks
-      command: docker network create frontend_network backend_network monitoring_network
-      ignore_errors: true
-
     - name: Stop and remove existing containers along with volumes(when force restart is true)
       command: docker compose -f compose.monitoring.yaml down --volumes
       args:
