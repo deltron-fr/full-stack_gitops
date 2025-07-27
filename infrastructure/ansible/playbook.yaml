@@ -37,7 +37,7 @@
       apt:
         pkg:
           - certbot
-        state: 
+        state: latest
         
     - name: Check if SSL Certificate exists
       stat:
